@@ -21,6 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include "OLED.h"
+#include "Serial.h"
 
 /* USER CODE END Includes */
 
@@ -50,13 +53,9 @@ UART_HandleTypeDef huart1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
-//单独封装一下发送函数(使用USART1)
-
-static void Serial_SendByte(uint8_t Byte);
-static void Serial_SendString(char* str);
-uint16_t My_strlen(char* str);
 
 
 /* USER CODE END PFP */
@@ -96,26 +95,53 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
 
+  /* Initialize interrupts */
+  MX_NVIC_Init();
+  /* USER CODE BEGIN 2 */
+  OLED_Init();
+  Serial_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   
+  //发送
+  
   Serial_SendByte(0x53);
   Serial_SendByte(0x43);
   Serial_SendByte('U');
-  Serial_SendByte('T');
-  Serial_SendByte('\n');
+  Serial_SendString("T\r\n");
   
-  Serial_SendString("HUA_NAN_HU");
+  
+  Serial_SendString("HUA_NAN_HU\r\n");
+  
+  Serial_SendNum(1888);
+  Serial_SendString("  JLHS\r\n");
+  
+  printf("南京\r\n");
+  
+  OLED_ShowString(1, 1, "RD:");
+  
+  //接收
   
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    if (Serial_GetRxFlag() == 1)
+    {
+        //接收并回传
+        uint8_t content = Serial_ReceiveByte();
+        Serial_SendByte(content);
+        Serial_SendNum((uint32_t) content);
+        
+        //OLED显示
+        OLED_ShowHexNum(1,4,content,2);
+        OLED_ShowChar(1,8,content);
+    }
+    
   }
   /* USER CODE END 3 */
 }
@@ -160,6 +186,17 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* USART1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART1_IRQn, 1, 1);
+  HAL_NVIC_EnableIRQ(USART1_IRQn);
+}
+
+/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -199,6 +236,7 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
@@ -207,6 +245,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, OLED_SCL_Pin|OLED_SDA_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : OLED_SCL_Pin OLED_SDA_Pin */
+  GPIO_InitStruct.Pin = OLED_SCL_Pin|OLED_SDA_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -214,28 +263,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-//Serial_SendByte函数
-static void Serial_SendByte(uint8_t Byte)
-{
-    HAL_UART_Transmit(&huart1, &Byte , 1, 200);
-}
-//Serial_SendString函数
-static void Serial_SendString(char *str)
-{
-    HAL_UART_Transmit(&huart1, (uint8_t *)str , My_strlen(str), 200);
-}
-
-//My_strlen函数
-uint16_t My_strlen(char* str)
-{
-    uint16_t i = 0;
-    for ( ; str[i] != '\0' ; i++)
-    {
-    
-    }
-    return i;
-}
 
 /* USER CODE END 4 */
 
