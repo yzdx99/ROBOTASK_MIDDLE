@@ -9,8 +9,8 @@ STM32与电脑的双向通信。
 
 软件介绍： 
 1.该工程使用CubeMX生成初始化代码。   
-2.使用USART实现与电脑的串口通信。。    
-3.Serial和OLED的函数在单独Hardware文件夹内定义。
+2.使用USART实现与电脑的串口通信。     
+3.Serial和OLED的函数在单独Hardware文件夹内定义。   
 4.OLED使用IIC通信。   
 5.串口工具使用江科大的。    
 
