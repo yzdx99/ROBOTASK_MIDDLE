@@ -84,7 +84,7 @@ int fputc (int ch, FILE *f)
 //串口接收(单字节)
 
 
-//接受初始化
+//接收初始化
 void Serial_Init(void)
 {
     Serial_RxFlag = 0;

@@ -2,8 +2,8 @@
 #include "OLED_Font.h"
 
 /*引脚配置*/
-#define OLED_W_SCL(x)   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, (GPIO_PinState)(x))
-#define OLED_W_SDA(x)   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, (GPIO_PinState)(x))
+#define OLED_W_SCL(x)   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, (GPIO_PinState)(x))
+#define OLED_W_SDA(x)   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, (GPIO_PinState)(x))
 
 
 
