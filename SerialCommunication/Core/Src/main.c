@@ -121,9 +121,9 @@ int main(void)
   
   printf("南京\r\n");
   
-  OLED_ShowString(1, 1, "RD:");
-  
   //接收
+  
+  OLED_ShowString(1, 1, "RD:");
   
   while (1)
   {
